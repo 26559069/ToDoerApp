@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ToDoer</title>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+    <h1>ToDoer App</h1>
+    <table class="todo-editor-table">
+        <tr>
+            <td>
+                <div class="list-div">
+                    <!-- The list of to-do items is displayed on the left side of the page -->
+                    <select id="todo-list" size="8" aria-label="To-do items">
+                        <option>Example to-do</option>
+                        <option>Another to-do</option>
+                    </select>
+                </div>
+            </td>
+            <td>
+                <form>
+                    <!-- The Name field in the top of the form on the right side of the page -->
+                    <div class="field-div">
+                        <label for="todo-name">Name</label>
+                        <input id="todo-name" name="name" type="text">
+                    </div>
+                    <!-- The Notes field in the middle of the form on the right side of the page -->
+                    <div class="field-div">
+                        <label for="todo-notes">Notes</label>
+                        <textarea id="todo-notes" name="notes" rows="6"></textarea>
+                    </div>
+                    <!-- The Save and Delete buttons at the bottom of the form on the right side of the page -->
+                    <div class="actions-div">
+                        <button type="button">Save</button>
+                        <button type="button">Delete</button>
+                    </div>
+                </form>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
