@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ToDoer</title>
     <link rel="stylesheet" href="./css/styles.css">
+    <script type="module" src="./js/todoHandlers.js"></script>
 </head>
 
 <body>
@@ -16,8 +17,6 @@
                 <div class="list-div">
                     <!-- The list of to-do items is displayed on the left side of the page -->
                     <select id="todo-list" size="8" aria-label="To-do items">
-                        <option>Example to-do</option>
-                        <option>Another to-do</option>
                     </select>
                 </div>
             </td>
@@ -33,10 +32,11 @@
                         <label for="todo-notes">Notes</label>
                         <textarea id="todo-notes" name="notes" rows="6"></textarea>
                     </div>
-                    <!-- The Save and Delete buttons at the bottom of the form on the right side of the page -->
+                    <!-- The New/Save and Delete buttons at the bottom of the form -->
                     <div class="actions-div">
-                        <button type="button">Save</button>
-                        <button type="button">Delete</button>
+                        <button id="todo-save" type="button" disabled>Save</button>
+                        <button id="todo-delete" type="button">Delete</button>
+                        <img id="wipe-image" src="./assets/wipe_icon.png" alt="wipe">
                     </div>
                 </form>
             </td>
