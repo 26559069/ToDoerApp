@@ -1,3 +1,5 @@
+import { TodoItem } from "./TodoItem.js";
+
 // #region: Global variables and constants
 const todoList = document.querySelector("#todo-list");
 const nameInput = document.querySelector("#todo-name");
@@ -12,10 +14,10 @@ const STORAGE_KEY = "todoer-items";
 // #region: Setup event listeners
 document.addEventListener("DOMContentLoaded", onPageLoad);
 todoList.addEventListener("change", onItemSelected);
-nameInput.addEventListener("input", onNameChanged);
 saveButton.addEventListener("click", onSaveClicked);
-deleteButton.addEventListener("click", onDeleteItem);
+deleteButton.addEventListener("click",  onDeleteClicked);
 wipeImage.addEventListener("click", onWipeImageClicked);
+nameInput.addEventListener("input", onNameChanged);
 // #endregion: Setup event listeners
 
 // #region: event handlers
@@ -25,9 +27,10 @@ wipeImage.addEventListener("click", onWipeImageClicked);
  * fills them in the list and resets the state of the form.
  */
 async function onPageLoad() {
-    let items = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+    const items = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
     for (const item of items) {
-        todoList.append(createOption(item));
+        const todoItem = new TodoItem(item.name, item.notes);
+        todoList.append(todoItem.toOption());
     };
     onWipeImageClicked();
     onNameChanged();
@@ -38,9 +41,55 @@ async function onPageLoad() {
  * It fills in the form with the selected item's name and notes and adjust the buttons accordingly.
  */
 async function onItemSelected() {
-    const item = todoList.options[todoList.selectedIndex].todoItem;
-    nameInput.value = item.name;
-    notesInput.value = item.notes;
+    const todoItem = todoList.options[todoList.selectedIndex].todoItem;
+    nameInput.value = todoItem.name;
+    notesInput.value = todoItem.notes;
+    onNameChanged();
+}
+
+/**
+ * This function is called when the Save button is clicked.
+ * It saves the current name and notes to the list, either by adding a new item or updating an existing one.
+ * It also persists the changes to local storage and updates the form state accordingly.
+ */
+async function onSaveClicked() {
+    const name = nameInput.value.trim();
+    const notes = notesInput.value.trim();
+    const todoItem = new TodoItem(name, notes);
+    const matchingIndex = findItemByName(name);
+    if (matchingIndex < 0) {
+        todoList.append(todoItem.toOption());
+        todoList.selectedIndex = todoList.options.length - 1;
+    } else {
+        todoList.options[matchingIndex].todoItem = todoItem;
+        todoList.options[matchingIndex].textContent = todoItem.name;
+        todoList.selectedIndex = matchingIndex;
+    }
+    onNameChanged();
+    persistItems();
+}
+
+/**
+ * This function is called when the Delete button is clicked.
+ * It removes the selected item from the list, clears the form, updates the state of the buttons
+ * and persists the changes to local storage.
+ */
+async function onDeleteClicked() {
+    todoList.remove(todoList.selectedIndex);
+    onWipeImageClicked();
+    onNameChanged();
+    persistItems();
+}
+
+/**
+ * This function is called when the Wipe Image is clicked.
+ * It clears the form, resets the selection in the list and updates the state of the buttons.
+ */
+async function onWipeImageClicked() {
+    todoList.selectedIndex = -1;
+    nameInput.value = "";
+    notesInput.value = "";
+    wipeImage.style.display = "none";
     onNameChanged();
 }
 
@@ -61,53 +110,9 @@ async function onNameChanged() {
         wipeImage.style.display = "block";
     }
     todoList.selectedIndex = index;
-    notesInput.value = todoList.options[index].todoItem.notes;
-}
-
-/**
- * This function is called when the Save button is clicked.
- * It saves the current name and notes to the list, either by adding a new item or updating an existing one.
- * It also persists the changes to local storage and updates the form state accordingly.
- */
-async function onSaveClicked() {
-    const name = nameInput.value.trim();
-    const notes = notesInput.value.trim();
-    const item = { name, notes };
-    const matchingIndex = findItemByName(name);
-    if (matchingIndex < 0) {
-        todoList.append(createOption(item));
-        todoList.selectedIndex = todoList.options.length - 1;
-    } else {
-        todoList.options[matchingIndex].todoItem = item;
-        todoList.options[matchingIndex].textContent = item.name;
-        todoList.selectedIndex = matchingIndex;
+    if (index >= 0) {
+        notesInput.value = todoList.options[index].todoItem.notes;
     }
-    onNameChanged();
-    persistItems();
-}
-
-/**
- * This function is called when the Delete button is clicked.
- * It removes the selected item from the list, clears the form, updates the state of the buttons
- * and persists the changes to local storage.
- */
-async function onDeleteItem() {
-    todoList.remove(todoList.selectedIndex);
-    onWipeImageClicked();
-    onNameChanged();
-    persistItems();
-}
-
-/**
- * This function is called when the Wipe Image is clicked.
- * It clears the form, resets the selection in the list and updates the state of the buttons.
- */
-async function onWipeImageClicked() {
-    todoList.selectedIndex = -1;
-    nameInput.value = "";
-    notesInput.value = "";
-    wipeImage.style.display = "none";
-    onNameChanged();
 }
 // #endregion: event handlers
 
@@ -119,18 +124,6 @@ async function onWipeImageClicked() {
  */
 function findItemByName(name) {
     return Array.from(todoList.options).findIndex(option => option.todoItem.name === name);
-}
-
-/**
- * Creates a new option element for a todo item.
- * @param {item} item - The todo item to create an option for.
- * @returns {HTMLOptionElement} The created option element.
- */
-function createOption(item) {
-    const option = document.createElement("option");
-    option.todoItem = item; // custom property attached to the option element
-    option.textContent = item.name;
-    return option;
 }
 
 /**
